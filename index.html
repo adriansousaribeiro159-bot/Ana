@@ -1,0 +1,1752 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ANA AI // Sistema de Inteligência Pessoal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fontes Futuristas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Ícones Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-void: #030712;
+            --bg-panel: rgba(8, 15, 32, 0.82);
+            --neon-cyan: #00f3ff;
+            --neon-blue: #0088ff;
+            --neon-purple: #7000ff;
+            --neon-amber: #ffaa00;
+            --neon-red: #ff2a5f;
+            --neon-green: #00ff9d;
+            --border-hud: rgba(0, 243, 255, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 136, 255, 0.14) 0%, transparent 60%),
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 28px 28px, 28px 28px;
+        }
+
+        .font-hud { font-family: 'Orbitron', sans-serif; }
+        .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+
+        /* Scrollbar Customizada */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(3, 7, 18, 0.9); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.3); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+
+        /* Bordas e Painéis Holográficos */
+        .hud-panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-hud);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.05), inset 0 0 15px rgba(0, 136, 255, 0.06);
+        }
+
+        .hud-card {
+            background: rgba(10, 20, 42, 0.65);
+            border: 1px solid rgba(0, 243, 255, 0.18);
+            transition: all 0.25s ease;
+        }
+        .hud-card:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.12);
+        }
+
+        .hud-glow-text {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+        }
+
+        /* Núcleo da IA (Arc Reactor / Jarvis Core) */
+        .ana-core-wrapper {
+            position: relative;
+            width: 112px;
+            height: 112px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .core-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: all 0.4s ease;
+        }
+
+        .ring-outer {
+            width: 108px;
+            height: 108px;
+            border-top-color: var(--neon-cyan);
+            border-bottom-color: var(--neon-blue);
+            border-left-color: rgba(0, 243, 255, 0.15);
+            border-right-color: rgba(0, 243, 255, 0.15);
+            animation: spinSlow 10s linear infinite;
+        }
+
+        .ring-mid {
+            width: 84px;
+            height: 84px;
+            border-left-color: var(--neon-cyan);
+            border-right-color: var(--neon-cyan);
+            border-top-style: dashed;
+            border-bottom-style: dashed;
+            border-top-color: rgba(0, 136, 255, 0.4);
+            border-bottom-color: rgba(0, 136, 255, 0.4);
+            animation: spinReverse 6s linear infinite;
+        }
+
+        .ring-inner {
+            width: 60px;
+            height: 60px;
+            border: 1.5px solid rgba(0, 243, 255, 0.7);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 12px rgba(0, 243, 255, 0.4);
+            animation: pulseIdle 3s ease-in-out infinite;
+        }
+
+        .core-nucleus {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 0%, var(--neon-cyan) 45%, var(--neon-blue) 85%, transparent 100%);
+            box-shadow: 0 0 25px var(--neon-cyan), 0 0 45px var(--neon-blue);
+            transition: all 0.3s ease;
+        }
+
+        /* Estados do Núcleo */
+        .state-listening .ring-outer {
+            border-top-color: var(--neon-red);
+            border-bottom-color: var(--neon-amber);
+            animation-duration: 2.5s;
+        }
+        .state-listening .ring-inner {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 22px rgba(255, 42, 95, 0.7);
+            transform: scale(1.1);
+        }
+        .state-listening .core-nucleus {
+            background: radial-gradient(circle, #fff 0%, #ff5e84 50%, var(--neon-red) 90%);
+            box-shadow: 0 0 30px var(--neon-red);
+            animation: pulseFast 0.7s ease-in-out infinite;
+        }
+
+        .state-processing .ring-outer { animation-duration: 1.2s; }
+        .state-processing .ring-mid { animation-duration: 0.9s; border-left-color: #a855f7; border-right-color: #a855f7; }
+        .state-processing .core-nucleus {
+            background: radial-gradient(circle, #fff 0%, #c084fc 50%, var(--neon-blue) 90%);
+            animation: pulseFast 0.5s ease-in-out infinite;
+        }
+
+        .state-speaking .ring-inner {
+            animation: voiceWave 0.45s ease-in-out infinite alternate;
+        }
+        .state-speaking .core-nucleus {
+            animation: voiceCore 0.35s ease-in-out infinite alternate;
+        }
+
+        @keyframes spinSlow { 100% { transform: rotate(360deg); } }
+        @keyframes spinReverse { 100% { transform: rotate(-360deg); } }
+        @keyframes pulseIdle {
+            0%, 100% { transform: scale(1); opacity: 0.85; }
+            50% { transform: scale(1.06); opacity: 1; }
+        }
+        @keyframes pulseFast {
+            0%, 100% { transform: scale(0.95); }
+            50% { transform: scale(1.18); }
+        }
+        @keyframes voiceWave {
+            0% { transform: scale(0.96); box-shadow: 0 0 12px var(--neon-cyan); }
+            100% { transform: scale(1.16); box-shadow: 0 0 28px var(--neon-cyan); }
+        }
+        @keyframes voiceCore {
+            0% { transform: scale(0.92); filter: brightness(1); }
+            100% { transform: scale(1.22); filter: brightness(1.35); }
+        }
+
+        /* Animação de entrada de mensagens */
+        @keyframes msgFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .msg-anim { animation: msgFadeIn 0.28s ease-out forwards; }
+
+        /* Botão Mic Pulsante */
+        .mic-active {
+            background: rgba(255, 42, 95, 0.25) !important;
+            border-color: #ff2a5f !important;
+            color: #ff2a5f !important;
+            box-shadow: 0 0 20px rgba(255, 42, 95, 0.5) !important;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-200 selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- BARRA SUPERIOR HUD (STATUS E COTAS) -->
+    <header class="hud-panel sticky top-0 z-40 border-b border-cyan-500/30 px-3 py-2.5 sm:px-6">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <!-- Identidade & Status -->
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-cyan-950/80 border border-cyan-400/50 shadow-[0_0_12px_rgba(0,243,255,0.3)]">
+                    <span class="font-hud font-bold text-cyan-300 text-sm">A</span>
+                    <span id="header-status-dot" class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-hud font-bold text-sm sm:text-base tracking-wider text-cyan-300 hud-glow-text">ANA AI</h1>
+                        <span class="text-[10px] font-mono-code px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-400/30 text-cyan-300">v2.6 HUD</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-[11px] text-slate-400">
+                        <span id="ai-status-text" class="text-cyan-400 font-medium">SISTEMA ONLINE • AGUARDANDO</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contadores de Cotas Diárias -->
+            <div class="flex items-center gap-1.5 sm:gap-2.5 overflow-x-auto py-0.5">
+                <button onclick="switchTab('settings')" title="Cotas Diárias de Mensagens" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-cyan-500/25 hover:border-cyan-400/60 transition text-xs">
+                    <i data-lucide="message-square" class="w-3.5 h-3.5 text-cyan-400"></i>
+                    <span class="hidden md:inline text-slate-400">Msgs:</span>
+                    <span id="quota-msg-display" class="font-mono-code font-semibold text-cyan-300">--/--</span>
+                </button>
+                <button onclick="switchTab('settings')" title="Cotas Diárias de Imagens" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-cyan-500/25 hover:border-cyan-400/60 transition text-xs">
+                    <i data-lucide="image" class="w-3.5 h-3.5 text-sky-400"></i>
+                    <span class="hidden md:inline text-slate-400">Imgs:</span>
+                    <span id="quota-img-display" class="font-mono-code font-semibold text-sky-300">--/--</span>
+                </button>
+                <button onclick="switchTab('settings')" title="Cotas Diárias de Vídeos" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-cyan-500/25 hover:border-cyan-400/60 transition text-xs">
+                    <i data-lucide="film" class="w-3.5 h-3.5 text-purple-400"></i>
+                    <span class="hidden md:inline text-slate-400">Vídeos:</span>
+                    <span id="quota-vid-display" class="font-mono-code font-semibold text-purple-300">--/--</span>
+                </button>
+                <button onclick="switchTab('settings')" title="Cotas Diárias de Pesquisas" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-cyan-500/25 hover:border-cyan-400/60 transition text-xs">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span class="hidden md:inline text-slate-400">Busca:</span>
+                    <span id="quota-search-display" class="font-mono-code font-semibold text-emerald-300">--/--</span>
+                </button>
+
+                <!-- Controle de Voz Feminina -->
+                <button id="toggle-voice-btn" onclick="toggleVoiceOutput()" title="Ativar/Desativar Voz da ANA" class="p-1.5 rounded-lg bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 hover:bg-cyan-500/25 transition">
+                    <i id="voice-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-3 pb-24 md:pb-6 flex flex-col lg:flex-row gap-4">
+
+        <!-- COLUNA ESQUERDA (NÚCLEO HOLOGRÁFICO + TELEMETRIA + MENU DESKTOP) -->
+        <aside class="lg:w-72 flex-shrink-0 flex flex-col gap-3">
+            <!-- Cartão do Núcleo -->
+            <div class="hud-panel rounded-2xl p-4 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 relative overflow-hidden">
+                <div class="absolute top-2 left-3 text-[10px] font-mono-code text-cyan-500/60">CORE // NEURAL-LINK</div>
+                <div class="absolute top-2 right-3 text-[10px] font-mono-code text-cyan-500/60" id="hud-clock">--:--</div>
+
+                <!-- Núcleo Animado -->
+                <div id="ana-core" class="ana-core-wrapper my-1 cursor-pointer" onclick="triggerCoreGreeting()" title="Toque para ativar saudação vocal">
+                    <div class="core-ring ring-outer"></div>
+                    <div class="core-ring ring-mid"></div>
+                    <div class="core-ring ring-inner"></div>
+                    <div class="core-nucleus"></div>
+                </div>
+
+                <!-- Diagnóstico Rápido de Módulos -->
+                <div class="flex-1 lg:w-full space-y-1.5 text-xs">
+                    <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-950/70 border border-cyan-500/15">
+                        <span class="text-slate-400">Núcleo Local:</span>
+                        <span class="text-emerald-400 font-mono-code text-[11px]">ATIVO (100%)</span>
+                    </div>
+                    <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-950/70 border border-cyan-500/15">
+                        <span class="text-slate-400">LLM Externo:</span>
+                        <span id="diag-llm" class="text-amber-400 font-mono-code text-[11px]">MODO LOCAL</span>
+                    </div>
+                    <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-950/70 border border-cyan-500/15">
+                        <span class="text-slate-400">Motor Imagem:</span>
+                        <span id="diag-img" class="text-amber-400 font-mono-code text-[11px]">DESATIVADO</span>
+                    </div>
+                    <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-950/70 border border-cyan-500/15">
+                        <span class="text-slate-400">Motor Vídeo:</span>
+                        <span id="diag-vid" class="text-rose-400 font-mono-code text-[11px]">NÃO CONECTADO</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegação Lateral (Desktop) -->
+            <nav class="hidden md:flex flex-col gap-1.5 hud-panel rounded-2xl p-2.5">
+                <button onclick="switchTab('chat')" data-tab="chat" class="nav-btn active flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
+                    <i data-lucide="bot" class="w-4 h-4"></i> Central de Comando (Chat)
+                </button>
+                <button onclick="switchTab('media')" data-tab="media" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i> Estúdio Visual (Img / Vídeo)
+                </button>
+                <button onclick="switchTab('search')" data-tab="search" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
+                    <i data-lucide="search" class="w-4 h-4"></i> Pesquisa & Inteligência Web
+                </button>
+                <button onclick="switchTab('code')" data-tab="code" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
+                    <i data-lucide="code-2" class="w-4 h-4"></i> Laboratório de Código & Sites
+                </button>
+                <button onclick="switchTab('tasks')" data-tab="tasks" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
+                    <i data-lucide="check-square" class="w-4 h-4"></i> Tarefas & Anotações
+                </button>
+                <button onclick="switchTab('memory')" data-tab="memory" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
+                    <i data-lucide="cpu" class="w-4 h-4"></i> Memória Autorizada
+                </button>
+                <button onclick="switchTab('settings')" data-tab="settings" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
+                    <i data-lucide="sliders" class="w-4 h-4"></i> APIs, Voz & Cotas
+                </button>
+            </nav>
+        </aside>
+
+        <!-- ÁREA CENTRAL DINÂMICA (ABAS) -->
+        <section class="flex-1 flex flex-col min-w-0">
+
+            <!-- ================= ABA 1: CHAT INTELIGENTE ================= -->
+            <div id="tab-chat" class="tab-content flex-1 flex flex-col hud-panel rounded-2xl overflow-hidden min-h-[62vh] max-h-[76vh]">
+                <!-- Barra Superior do Chat -->
+                <div class="px-4 py-2.5 border-b border-cyan-500/20 flex items-center justify-between bg-slate-950/50">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                        <span class="font-hud text-xs tracking-wider text-cyan-300">CANAL DE COMUNICAÇÃO DIRETA</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="clearChatHistory()" class="text-xs text-slate-400 hover:text-rose-400 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-rose-500/10 transition">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feed de Mensagens -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Mensagens inseridas dinamicamente -->
+                </div>
+
+                <!-- Sugestões Rápidas -->
+                <div class="px-3 py-2 border-t border-cyan-500/15 bg-slate-950/40 flex gap-2 overflow-x-auto no-scrollbar">
+                    <button onclick="quickCommand('Quais são minhas tarefas pendentes?')" class="whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/20 transition">📋 Minhas tarefas</button>
+                    <button onclick="quickCommand('Pesquisar na internet sobre Inteligência Artificial')" class="whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/20 transition">🌐 Pesquisar na web</button>
+                    <button onclick="quickCommand('Criar código de um site futurista em HTML')" class="whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/20 transition">💻 Gerar site HTML</button>
+                    <button onclick="quickCommand('Calcular (1450 * 3.5) + 420')" class="whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/20 transition">🧮 Calcular</button>
+                    <button onclick="quickCommand('Status do sistema e conexões')" class="whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/20 transition">⚡ Diagnóstico</button>
+                </div>
+
+                <!-- Input de Comando + Microfone -->
+                <form id="chat-form" onsubmit="handleChatSubmit(event)" class="p-3 bg-slate-950/80 border-t border-cyan-500/25 flex items-center gap-2">
+                    <button type="button" id="mic-btn" onclick="toggleSpeechRecognition()" title="Falar com a ANA AI" class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-400/40 text-cyan-300 hover:bg-cyan-500/20 transition flex-shrink-0">
+                        <i data-lucide="mic" class="w-5 h-5"></i>
+                    </button>
+                    <input id="chat-input" type="text" autocomplete="off" placeholder="Digite um comando ou toque no microfone..." class="flex-1 bg-slate-900/90 border border-cyan-500/30 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition">
+                    <button type="submit" class="p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-semibold hover:brightness-110 transition flex-shrink-0 shadow-[0_0_15px_rgba(0,243,255,0.35)]">
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- ================= ABA 2: ESTÚDIO VISUAL (IMAGENS & VÍDEOS) ================= -->
+            <div id="tab-media" class="tab-content hidden flex-1 hud-panel rounded-2xl p-4 sm:p-6 space-y-6 overflow-y-auto">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-500/20 pb-3">
+                    <div>
+                        <h2 class="font-hud text-base sm:text-lg text-cyan-300">ESTÚDIO DE SÍNTESE VISUAL</h2>
+                        <p class="text-xs text-slate-400">Geração real condicionada a motores conectados e cotas diárias.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <!-- MÓDULO DE IMAGENS -->
+                    <div class="hud-card rounded-2xl p-4 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-hud text-sm text-sky-300 flex items-center gap-2">
+                                <i data-lucide="image" class="w-4 h-4"></i> Gerador de Imagens
+                            </h3>
+                            <span id="img-engine-badge" class="text-[11px] font-mono-code px-2 py-0.5 rounded bg-amber-500/15 border border-amber-400/40 text-amber-300">NÃO ATIVADO</span>
+                        </div>
+
+                        <div id="img-activation-banner" class="p-3 rounded-xl bg-sky-950/50 border border-sky-500/30 text-xs space-y-2">
+                            <p class="text-slate-300">Nenhum motor de imagem está ativo no momento. Você pode ativar o serviço gratuito <strong>Pollinations.ai</strong> (sem necessidade de chave) ou configurar uma chave API nas Configurações.</p>
+                            <button onclick="enableFreeImageEngine()" class="px-3 py-1.5 rounded-lg bg-sky-500 text-slate-950 font-semibold hover:bg-sky-400 transition">
+                                Ativar Motor Gratuito (Pollinations.ai)
+                            </button>
+                        </div>
+
+                        <div class="space-y-3">
+                            <textarea id="img-prompt" rows="3" placeholder="Descreva a imagem em detalhes (ex: Armadura futurista preta e azul neon em laboratório holográfico)..." class="w-full bg-slate-950/90 border border-cyan-500/30 rounded-xl p-3 text-sm text-white outline-none focus:border-cyan-400"></textarea>
+                            <div class="flex flex-wrap gap-2 items-center justify-between">
+                                <select id="img-aspect" class="bg-slate-950 border border-cyan-500/30 rounded-xl px-3 py-2 text-xs text-cyan-200 outline-none">
+                                    <option value="1024x1024">Quadrada (1:1)</option>
+                                    <option value="1280x720">Paisagem HD (16:9)</option>
+                                    <option value="720x1280">Retrato Mobile (9:16)</option>
+                                </select>
+                                <button onclick="generateRealImage()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 text-slate-950 font-semibold text-xs hover:brightness-110 transition flex items-center gap-1.5">
+                                    <i data-lucide="wand-2" class="w-4 h-4"></i> Gerar Imagem Real
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Resultado da Imagem -->
+                        <div id="img-result-box" class="min-h-[200px] rounded-xl bg-slate-950/80 border border-dashed border-cyan-500/25 flex flex-col items-center justify-center p-4 text-center">
+                            <i data-lucide="image-off" class="w-8 h-8 text-slate-600 mb-2"></i>
+                            <p class="text-xs text-slate-500">Nenhuma imagem gerada nesta sessão.</p>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO DE VÍDEOS -->
+                    <div class="hud-card rounded-2xl p-4 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-hud text-sm text-purple-300 flex items-center gap-2">
+                                <i data-lucide="film" class="w-4 h-4"></i> Síntese de Vídeo
+                            </h3>
+                            <span id="vid-engine-badge" class="text-[11px] font-mono-code px-2 py-0.5 rounded bg-rose-500/15 border border-rose-400/40 text-rose-300">OFFLINE</span>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-rose-950/30 border border-rose-500/30 text-xs space-y-1.5">
+                            <p class="text-rose-200 font-medium flex items-center gap-1.5">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i> Aviso de Integridade Técnica
+                            </p>
+                            <p class="text-slate-300">Geração real de vídeo por IA exige processamento GPU externo (ex: Replicate, Fal.ai, Runway ou HuggingFace Endpoint). A ANA AI <strong>nunca exibe vídeos falsos ou pré-gravados</strong>.</p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <textarea id="vid-prompt" rows="3" placeholder="Descreva a cena em movimento para envio ao endpoint de vídeo..." class="w-full bg-slate-950/90 border border-purple-500/30 rounded-xl p-3 text-sm text-white outline-none focus:border-purple-400"></textarea>
+                            <div class="flex justify-end">
+                                <button onclick="generateRealVideo()" class="px-4 py-2 rounded-xl bg-purple-600/80 hover:bg-purple-500 text-white font-semibold text-xs transition flex items-center gap-1.5">
+                                    <i data-lucide="video" class="w-4 h-4"></i> Solicitar Vídeo via API
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="vid-result-box" class="min-h-[200px] rounded-xl bg-slate-950/80 border border-dashed border-purple-500/25 flex flex-col items-center justify-center p-4 text-center">
+                            <i data-lucide="server-off" class="w-8 h-8 text-slate-600 mb-2"></i>
+                            <p class="text-xs text-slate-400">Endpoint de vídeo não conectado. Configure uma URL/Chave de API na aba <strong>APIs, Voz & Cotas</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ABA 3: PESQUISA NA INTERNET ================= -->
+            <div id="tab-search" class="tab-content hidden flex-1 hud-panel rounded-2xl p-4 sm:p-6 space-y-4 overflow-y-auto">
+                <div class="border-b border-cyan-500/20 pb-3">
+                    <h2 class="font-hud text-base sm:text-lg text-cyan-300">PESQUISA WEB EM TEMPO REAL</h2>
+                    <p class="text-xs text-slate-400">Consulta gratuita via Wikipedia PT-BR & DuckDuckGo Instant Answer API (sem necessidade de chave).</p>
+                </div>
+
+                <form onsubmit="handleWebSearch(event)" class="flex gap-2">
+                    <input id="web-search-input" type="text" placeholder="Pesquisar fatos, conceitos, ciência, história, tecnologia..." class="flex-1 bg-slate-950/90 border border-cyan-500/30 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none">
+                    <button type="submit" class="px-5 py-3 rounded-xl bg-emerald-500 text-slate-950 font-semibold text-sm hover:bg-emerald-400 transition flex items-center gap-2">
+                        <i data-lucide="search" class="w-4 h-4"></i> Buscar
+                    </button>
+                </form>
+
+                <div id="search-results-container" class="space-y-3">
+                    <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-cyan-500/20 rounded-xl">
+                        Digite um termo acima para realizar uma varredura real na base de conhecimento da web.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ABA 4: LABORATÓRIO DE CÓDIGO ================= -->
+            <div id="tab-code" class="tab-content hidden flex-1 hud-panel rounded-2xl p-4 sm:p-6 space-y-4 overflow-y-auto">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-500/20 pb-3">
+                    <div>
+                        <h2 class="font-hud text-base sm:text-lg text-cyan-300">LABORATÓRIO DE CÓDIGO & PREVIEW</h2>
+                        <p class="text-xs text-slate-400">Gere templates funcionais ou teste códigos HTML/CSS/JS em ambiente isolado.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="loadCodeTemplate('landing')" class="text-xs px-2.5 py-1.5 rounded-lg bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/25">Template Landing Page</button>
+                        <button onclick="loadCodeTemplate('calculator')" class="text-xs px-2.5 py-1.5 rounded-lg bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/25">App Calculadora</button>
+                        <button onclick="copyEditorCode()" class="text-xs px-2.5 py-1.5 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 hover:bg-emerald-500/30 flex items-center gap-1">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+                        </button>
+                        <button onclick="runCodePreview()" class="text-xs px-3 py-1.5 rounded-lg bg-cyan-400 text-slate-950 font-semibold hover:bg-cyan-300 flex items-center gap-1">
+                            <i data-lucide="play" class="w-3.5 h-3.5"></i> Executar Preview
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[420px]">
+                    <div class="flex flex-col">
+                        <span class="text-[11px] font-mono-code text-cyan-400 mb-1">EDITOR DE CÓDIGO (HTML/CSS/JS)</span>
+                        <textarea id="code-editor" spellcheck="false" class="flex-1 min-h-[300px] w-full bg-slate-950 border border-cyan-500/30 rounded-xl p-3 font-mono-code text-xs text-cyan-100 outline-none focus:border-cyan-400"></textarea>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[11px] font-mono-code text-emerald-400 mb-1">SANDBOX DE EXECUÇÃO AO VIVO</span>
+                        <iframe id="code-preview-frame" sandbox="allow-scripts" class="flex-1 min-h-[300px] w-full bg-white rounded-xl border border-cyan-500/30"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ABA 5: TAREFAS E ANOTAÇÕES ================= -->
+            <div id="tab-tasks" class="tab-content hidden flex-1 hud-panel rounded-2xl p-4 sm:p-6 space-y-6 overflow-y-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Tarefas -->
+                    <div class="space-y-3">
+                        <h2 class="font-hud text-base text-cyan-300 flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i> PROTOCOLO DE TAREFAS
+                        </h2>
+                        <form onsubmit="addTaskFromForm(event)" class="flex gap-2">
+                            <input id="new-task-input" type="text" placeholder="Nova tarefa ou objetivo..." class="flex-1 bg-slate-950 border border-cyan-500/30 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-cyan-400">
+                            <button type="submit" class="px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-semibold text-sm hover:bg-cyan-400 transition">+</button>
+                        </form>
+                        <ul id="task-list" class="space-y-2 max-h-[380px] overflow-y-auto">
+                            <!-- Tarefas renderizadas aqui -->
+                        </ul>
+                    </div>
+
+                    <!-- Anotações -->
+                    <div class="space-y-3 flex flex-col">
+                        <div class="flex items-center justify-between">
+                            <h2 class="font-hud text-base text-cyan-300 flex items-center gap-2">
+                                <i data-lucide="file-text" class="w-4 h-4"></i> BLOCO DE NOTAS RÁPIDAS
+                            </h2>
+                            <span id="notes-saved-status" class="text-[11px] font-mono-code text-emerald-400">Salvo localmente</span>
+                        </div>
+                        <textarea id="quick-notes-area" oninput="saveQuickNotes()" placeholder="Escreva ideias, rascunhos, senhas temporárias ou planos de estudo..." class="flex-1 min-h-[280px] w-full bg-slate-950/90 border border-cyan-500/30 rounded-xl p-4 text-sm text-slate-200 outline-none focus:border-cyan-400 leading-relaxed"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ABA 6: MEMÓRIA AUTORIZADA ================= -->
+            <div id="tab-memory" class="tab-content hidden flex-1 hud-panel rounded-2xl p-4 sm:p-6 space-y-4 overflow-y-auto">
+                <div class="border-b border-cyan-500/20 pb-3">
+                    <h2 class="font-hud text-base sm:text-lg text-cyan-300">BANCO DE MEMÓRIA AUTORIZADA</h2>
+                    <p class="text-xs text-slate-400">A ANA AI jamais armazena informações pessoais permanentes sem sua permissão explícita.</p>
+                </div>
+
+                <form onsubmit="manualAddMemory(event)" class="flex flex-col sm:flex-row gap-2">
+                    <input id="manual-memory-input" type="text" placeholder="Ex: Meu nome é Carlos e estudo Engenharia de Software..." class="flex-1 bg-slate-950 border border-cyan-500/30 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-400">
+                    <button type="submit" class="px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-semibold text-sm hover:bg-cyan-400 transition">Autorizar & Salvar</button>
+                </form>
+
+                <div id="memory-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Memórias renderizadas aqui -->
+                </div>
+            </div>
+
+            <!-- ================= ABA 7: CONFIGURAÇÕES, APIS & COTAS ================= -->
+            <div id="tab-settings" class="tab-content hidden flex-1 hud-panel rounded-2xl p-4 sm:p-6 space-y-6 overflow-y-auto">
+                <div class="border-b border-cyan-500/20 pb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h2 class="font-hud text-base sm:text-lg text-cyan-300">CONFIGURAÇÃO DE NÚCLEO, APIS E COTAS</h2>
+                        <p class="text-xs text-slate-400">Todas as chaves são armazenadas exclusivamente no <code>localStorage</code> do seu navegador.</p>
+                    </div>
+                    <button onclick="saveAllSettings()" class="px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 font-semibold text-xs hover:bg-emerald-400 transition flex items-center gap-1.5">
+                        <i data-lucide="save" class="w-4 h-4"></i> Salvar Configurações
+                    </button>
+                </div>
+
+                <!-- Configuração de Voz -->
+                <div class="hud-card rounded-xl p-4 space-y-3">
+                    <h3 class="font-hud text-xs text-cyan-300 uppercase tracking-wider">1. Síntese de Voz Feminina (PT-BR)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Voz Selecionada</label>
+                            <select id="voice-select" class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-xs text-white outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Velocidade: <span id="rate-val">1.05</span>x</label>
+                            <input id="voice-rate" type="range" min="0.7" max="1.4" step="0.05" value="1.05" oninput="document.getElementById('rate-val').textContent=this.value" class="w-full accent-cyan-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Tom (Pitch): <span id="pitch-val">1.08</span></label>
+                            <input id="voice-pitch" type="range" min="0.8" max="1.3" step="0.02" value="1.08" oninput="document.getElementById('pitch-val').textContent=this.value" class="w-full accent-cyan-400">
+                        </div>
+                    </div>
+                    <button type="button" onclick="speakText('Sistemas vocais calibrados. Estou pronta para suas ordens.')" class="text-xs px-3 py-1.5 rounded-lg bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 hover:bg-cyan-500/25">
+                        Testar Voz da ANA
+                    </button>
+                </div>
+
+                <!-- Conexões de APIs Externas Gratuitas -->
+                <div class="hud-card rounded-xl p-4 space-y-4">
+                    <h3 class="font-hud text-xs text-cyan-300 uppercase tracking-wider">2. Integrações de Inteligência Artificial (Opcionais / Planos Gratuitos)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">Provedor de Chat LLM (Plano Gratuito)</label>
+                            <select id="cfg-llm-provider" class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-white outline-none">
+                                <option value="local">Apenas Núcleo Local (Offline / Sem Chave)</option>
+                                <option value="gemini">Google Gemini API (Free Tier - AI Studio)</option>
+                                <option value="groq">Groq Cloud API (Llama 3 - Free Tier Ultra Rápido)</option>
+                                <option value="openrouter">OpenRouter API (Modelos :free)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">Chave de API do Chat (LLM)</label>
+                            <input id="cfg-llm-key" type="password" placeholder="Cole sua API Key aqui..." class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">Motor de Imagens</label>
+                            <select id="cfg-img-provider" class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-white outline-none">
+                                <option value="none">Desativado</option>
+                                <option value="pollinations">Pollinations.ai (Gratuito sem chave)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">Endpoint Webhook/API de Vídeo (Replicate/Fal.ai)</label>
+                            <input id="cfg-vid-endpoint" type="url" placeholder="https://seu-endpoint-de-video.com/generate" class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-white outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Limites Diários Configuráveis -->
+                <div class="hud-card rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-hud text-xs text-cyan-300 uppercase tracking-wider">3. Cotas Diárias & Renovação Automática</h3>
+                        <button type="button" onclick="resetDailyQuotas(true)" class="text-xs px-2.5 py-1 rounded bg-amber-500/15 border border-amber-400/40 text-amber-300 hover:bg-amber-500/25">
+                            Renovar Cotas Agora
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div>
+                            <label class="block text-slate-400 mb-1">Limite Mensagens/Dia</label>
+                            <input id="limit-msg" type="number" min="1" max="5000" class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Limite Imagens/Dia</label>
+                            <input id="limit-img" type="number" min="0" max="500" class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Limite Vídeos/Dia</label>
+                            <input id="limit-vid" type="number" min="0" max="100" class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Limite Pesquisas/Dia</label>
+                            <input id="limit-search" type="number" min="1" max="1000" class="w-full bg-slate-950 border border-cyan-500/30 rounded-lg px-3 py-2 text-white">
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-500">Última renovação registrada: <span id="last-reset-date" class="text-cyan-400 font-mono-code">--</span></p>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR (MOBILE-FIRST) -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 hud-panel border-t border-cyan-500/30 px-1 py-1.5 flex justify-around items-center">
+        <button onclick="switchTab('chat')" data-tab="chat" class="mobile-nav-btn active flex flex-col items-center p-1.5 rounded-xl text-[10px] text-cyan-300">
+            <i data-lucide="bot" class="w-5 h-5 mb-0.5"></i> Chat
+        </button>
+        <button onclick="switchTab('media')" data-tab="media" class="mobile-nav-btn flex flex-col items-center p-1.5 rounded-xl text-[10px] text-slate-400">
+            <i data-lucide="sparkles" class="w-5 h-5 mb-0.5"></i> Mídia
+        </button>
+        <button onclick="switchTab('search')" data-tab="search" class="mobile-nav-btn flex flex-col items-center p-1.5 rounded-xl text-[10px] text-slate-400">
+            <i data-lucide="search" class="w-5 h-5 mb-0.5"></i> Busca
+        </button>
+        <button onclick="switchTab('code')" data-tab="code" class="mobile-nav-btn flex flex-col items-center p-1.5 rounded-xl text-[10px] text-slate-400">
+            <i data-lucide="code-2" class="w-5 h-5 mb-0.5"></i> Código
+        </button>
+        <button onclick="switchTab('tasks')" data-tab="tasks" class="mobile-nav-btn flex flex-col items-center p-1.5 rounded-xl text-[10px] text-slate-400">
+            <i data-lucide="check-square" class="w-5 h-5 mb-0.5"></i> Tarefas
+        </button>
+        <button onclick="switchTab('memory')" data-tab="memory" class="mobile-nav-btn flex flex-col items-center p-1.5 rounded-xl text-[10px] text-slate-400">
+            <i data-lucide="cpu" class="w-5 h-5 mb-0.5"></i> Memória
+        </button>
+        <button onclick="switchTab('settings')" data-tab="settings" class="mobile-nav-btn flex flex-col items-center p-1.5 rounded-xl text-[10px] text-slate-400">
+            <i data-lucide="sliders" class="w-5 h-5 mb-0.5"></i> Config
+        </button>
+    </nav>
+
+    <!-- MODAL HOLOGRÁFICO DE AUTORIZAÇÃO DE MEMÓRIA & NOTIFICAÇÕES -->
+    <div id="hud-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+        <div class="hud-panel max-w-md w-full rounded-2xl p-5 border border-cyan-400/50 shadow-[0_0_30px_rgba(0,243,255,0.2)] space-y-4">
+            <div class="flex items-center gap-2 text-cyan-300 font-hud text-sm">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                <span id="modal-title">PROTOCOLO DE SEGURANÇA</span>
+            </div>
+            <p id="modal-body" class="text-sm text-slate-300 leading-relaxed"></p>
+            <div id="modal-actions" class="flex justify-end gap-2 pt-2"></div>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================================
+           ESTADO GLOBAL E ARMAZENAMENTO LOCAL (PERSISTÊNCIA REAL)
+           ============================================================================ */
+        const STORAGE_KEYS = {
+            SETTINGS: 'ana_ai_settings_v1',
+            QUOTAS: 'ana_ai_quotas_v1',
+            TASKS: 'ana_ai_tasks_v1',
+            NOTES: 'ana_ai_notes_v1',
+            MEMORY: 'ana_ai_memory_v1',
+            CHAT: 'ana_ai_chat_v1'
+        };
+
+        const DEFAULT_SETTINGS = {
+            voiceEnabled: true,
+            voiceName: '',
+            voiceRate: 1.05,
+            voicePitch: 1.08,
+            llmProvider: 'local',
+            llmKey: '',
+            imgProvider: 'none',
+            vidEndpoint: '',
+            limits: {
+                msg: 100,
+                img: 15,
+                vid: 3,
+                search: 40
+            }
+        };
+
+        let appSettings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS)) || structuredClone(DEFAULT_SETTINGS);
+        let appTasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS)) || [
+            { id: 1, text: 'Revisar configurações de APIs gratuitas da ANA AI', done: false }
+        ];
+        let appMemories = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMORY)) || [];
+        let chatHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.CHAT)) || [];
+
+        /* ============================================================================
+           GESTÃO DE COTAS DIÁRIAS & RENOVAÇÃO AUTOMÁTICA
+           ============================================================================ */
+        function getTodayStr() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getQuotas() {
+            const today = getTodayStr();
+            let q = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUOTAS));
+            if (!q || q.date !== today) {
+                q = {
+                    date: today,
+                    used: { msg: 0, img: 0, vid: 0, search: 0 }
+                };
+                localStorage.setItem(STORAGE_KEYS.QUOTAS, JSON.stringify(q));
+            }
+            return q;
+        }
+
+        function resetDailyQuotas(notify = false) {
+            const q = {
+                date: getTodayStr(),
+                used: { msg: 0, img: 0, vid: 0, search: 0 }
+            };
+            localStorage.setItem(STORAGE_KEYS.QUOTAS, JSON.stringify(q));
+            updateQuotaUI();
+            if (notify) showHudToast('Cotas diárias renovadas com sucesso.');
+        }
+
+        function consumeQuota(type) {
+            const q = getQuotas();
+            const limit = appSettings.limits[type] ?? 0;
+            if (q.used[type] >= limit) {
+                return false;
+            }
+            q.used[type]++;
+            localStorage.setItem(STORAGE_KEYS.QUOTAS, JSON.stringify(q));
+            updateQuotaUI();
+            return true;
+        }
+
+        function updateQuotaUI() {
+            const q = getQuotas();
+            const L = appSettings.limits;
+            const remMsg = Math.max(0, L.msg - q.used.msg);
+            const remImg = Math.max(0, L.img - q.used.img);
+            const remVid = Math.max(0, L.vid - q.used.vid);
+            const remSearch = Math.max(0, L.search - q.used.search);
+
+            document.getElementById('quota-msg-display').textContent = `${remMsg}/${L.msg}`;
+            document.getElementById('quota-img-display').textContent = `${remImg}/${L.img}`;
+            document.getElementById('quota-vid-display').textContent = `${remVid}/${L.vid}`;
+            document.getElementById('quota-search-display').textContent = `${remSearch}/${L.search}`;
+            document.getElementById('last-reset-date').textContent = q.date;
+        }
+
+        /* ============================================================================
+           CONTROLE DE STATUS DO NÚCLEO HOLOGRÁFICO
+           ============================================================================ */
+        function setCoreState(state, label) {
+            const core = document.getElementById('ana-core');
+            const statusText = document.getElementById('ai-status-text');
+            const dot = document.getElementById('header-status-dot');
+
+            core.classList.remove('state-listening', 'state-processing', 'state-speaking');
+            if (state === 'listening') {
+                core.classList.add('state-listening');
+                dot.className = 'absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping';
+            } else if (state === 'processing') {
+                core.classList.add('state-processing');
+                dot.className = 'absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse';
+            } else if (state === 'speaking') {
+                core.classList.add('state-speaking');
+                dot.className = 'absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse';
+            } else {
+                dot.className = 'absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]';
+            }
+            statusText.textContent = label;
+        }
+
+        /* ============================================================================
+           VOZ FEMININA PT-BR (WEB SPEECH SYNTHESIS) & RECONHECIMENTO (MICROFONE)
+           ============================================================================ */
+        let availableVoices = [];
+
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+            availableVoices = window.speechSynthesis.getVoices();
+            const select = document.getElementById('voice-select');
+            if (!select) return;
+
+            const ptVoices = availableVoices.filter(v => v.lang.toLowerCase().includes('pt'));
+            const listToShow = ptVoices.length ? ptVoices : availableVoices;
+
+            select.innerHTML = '';
+            listToShow.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.name;
+                opt.textContent = `${v.name} (${v.lang})`;
+                select.appendChild(opt);
+            });
+
+            // Selecionar automaticamente uma voz feminina brasileira
+            if (!appSettings.voiceName && ptVoices.length) {
+                const femaleKeywords = ['francisca', 'luciana', 'maria', 'google português', 'female', 'feminino', 'vitoria', 'thalita', 'fernanda'];
+                const preferred = ptVoices.find(v => femaleKeywords.some(k => v.name.toLowerCase().includes(k))) || ptVoices[0];
+                if (preferred) {
+                    appSettings.voiceName = preferred.name;
+                    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appSettings));
+                }
+            }
+            if (appSettings.voiceName) select.value = appSettings.voiceName;
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        function toggleVoiceOutput() {
+            appSettings.voiceEnabled = !appSettings.voiceEnabled;
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appSettings));
+            if (!appSettings.voiceEnabled && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                setCoreState('idle', 'SISTEMA ONLINE • VOZ MUDA');
+            }
+            updateVoiceButtonUI();
+        }
+
+        function updateVoiceButtonUI() {
+            const btn = document.getElementById('toggle-voice-btn');
+            btn.innerHTML = appSettings.voiceEnabled
+                ? '<i data-lucide="volume-2" class="w-4 h-4"></i>'
+                : '<i data-lucide="volume-x" class="w-4 h-4 text-slate-500"></i>';
+            lucide.createIcons();
+        }
+
+        function speakText(text) {
+            if (!appSettings.voiceEnabled || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+
+            // Limpar markdown e blocos de código antes de falar
+            const cleanText = text
+                .replace(/```[\s\S]*?```/g, ' Código gerado exibido na tela. ')
+                .replace(/[*#_`]/g, '')
+                .replace(/https?:\/\/\S+/g, 'link externo')
+                .trim();
+
+            if (!cleanText) return;
+
+            const utter = new SpeechSynthesisUtterance(cleanText);
+            utter.lang = 'pt-BR';
+            utter.rate = parseFloat(appSettings.voiceRate) || 1.05;
+            utter.pitch = parseFloat(appSettings.voicePitch) || 1.08;
+
+            const voices = window.speechSynthesis.getVoices();
+            const chosen = voices.find(v => v.name === appSettings.voiceName) || voices.find(v => v.lang.includes('pt-BR'));
+            if (chosen) utter.voice = chosen;
+
+            utter.onstart = () => setCoreState('speaking', 'ANA AI • FALANDO...');
+            utter.onend = () => setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+            utter.onerror = () => setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+
+            window.speechSynthesis.speak(utter);
+        }
+
+        // Reconhecimento de Voz (Microfone)
+        let recognition = null;
+        let isListening = false;
+
+        function toggleSpeechRecognition() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) {
+                showHudModal('Microfone Indisponível', 'Seu navegador não suporta reconhecimento de voz nativo (Web Speech API). Tente usar Chrome ou Edge atualizado.');
+                return;
+            }
+
+            if (isListening && recognition) {
+                recognition.stop();
+                return;
+            }
+
+            recognition = new SpeechRec();
+            recognition.lang = 'pt-BR';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                isListening = true;
+                document.getElementById('mic-btn').classList.add('mic-active');
+                setCoreState('listening', 'OUVINDO COMANDO DE VOZ...');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chat-input').value = transcript;
+                processUserMessage(transcript);
+            };
+
+            recognition.onerror = (event) => {
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+                if (event.error === 'not-allowed') {
+                    showHudModal('Permissão Negada', 'Permita o acesso ao microfone no navegador para falar com a ANA AI.');
+                }
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                document.getElementById('mic-btn').classList.remove('mic-active');
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+            };
+
+            recognition.start();
+        }
+
+        /* ============================================================================
+           NAVEGAÇÃO ENTRE ABAS
+           ============================================================================ */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.remove('hidden');
+
+            // Desktop nav styling
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('bg-cyan-500/20', 'text-cyan-300', 'border', 'border-cyan-400/40');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-cyan-500/20', 'text-cyan-300', 'border', 'border-cyan-400/40');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+
+            // Mobile nav styling
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('text-cyan-300', 'bg-cyan-500/15');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('text-cyan-300', 'bg-cyan-500/15');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+        }
+
+        /* ============================================================================
+           CHAT INTELIGENTE + PROCESSADOR DE INTENÇÕES LOCAIS + API EXTERNA
+           ============================================================================ */
+        function appendMessage(sender, text, meta = '') {
+            const container = document.getElementById('chat-messages');
+            const isAna = sender === 'ana';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex flex-col ${isAna ? 'items-start' : 'items-end'} msg-anim`;
+
+            const bubble = document.createElement('div');
+            bubble.className = isAna
+                ? 'max-w-[88%] sm:max-w-[80%] rounded-2xl rounded-tl-sm p-3.5 bg-slate-900/95 border border-cyan-500/35 text-slate-100 text-sm shadow-[0_0_15px_rgba(0,243,255,0.08)]'
+                : 'max-w-[88%] sm:max-w-[80%] rounded-2xl rounded-tr-sm p-3.5 bg-gradient-to-r from-cyan-600/30 to-blue-600/30 border border-cyan-400/50 text-white text-sm';
+
+            // Formatar blocos de código e quebras de linha com segurança
+            bubble.innerHTML = formatMessageHTML(text);
+
+            const timestamp = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const footer = document.createElement('span');
+            footer.className = 'text-[10px] font-mono-code text-slate-500 mt-1 px-1';
+            footer.textContent = `${isAna ? 'ANA AI' : 'VOCÊ'} • ${timestamp} ${meta ? '• ' + meta : ''}`;
+
+            wrapper.appendChild(bubble);
+            wrapper.appendChild(footer);
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
+
+            chatHistory.push({ sender, text, meta, timestamp });
+            if (chatHistory.length > 50) chatHistory.shift();
+            localStorage.setItem(STORAGE_KEYS.CHAT, JSON.stringify(chatHistory));
+        }
+
+        function formatMessageHTML(raw) {
+            const escaped = raw
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            // Destacar blocos ```code```
+            return escaped
+                .replace(/```([\s\S]*?)```/g, '<pre class="mt-2 mb-2 p-3 rounded-xl bg-slate-950 border border-cyan-500/30 font-mono-code text-xs text-cyan-200 overflow-x-auto"><code>$1</code></pre>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-cyan-300">$1</strong>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            processUserMessage(msg);
+        }
+
+        function quickCommand(cmd) {
+            document.getElementById('chat-input').value = cmd;
+            processUserMessage(cmd);
+        }
+
+        async function processUserMessage(userText) {
+            if (!consumeQuota('msg')) {
+                showHudModal('Limite Diário Atingido', 'Sua cota diária de mensagens foi atingida. Você pode ajustar o limite ou renovar manualmente na aba Configurações.');
+                return;
+            }
+
+            appendMessage('user', userText);
+            setCoreState('processing', 'PROCESSANDO SOLICITAÇÃO...');
+
+            const lower = userText.toLowerCase();
+
+            // 1. Comando de Memória Autorizada ("lembrar que...", "memorizar...")
+            const memMatch = userText.match(/^(?:ana,?\s*)?(?:lembrar que|lembre que|memorizar|guarde na mem[óo]ria que)\s+(.+)/i);
+            if (memMatch) {
+                const fact = memMatch[1].trim();
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+                requestMemoryAuthorization(fact);
+                return;
+            }
+
+            // 2. Comando de Tarefas ("adicionar tarefa...", "nova tarefa...")
+            const taskMatch = userText.match(/^(?:ana,?\s*)?(?:adicionar tarefa|nova tarefa|criar tarefa|anotar tarefa)[:\s]+(.+)/i);
+            if (taskMatch) {
+                const taskText = taskMatch[1].trim();
+                appTasks.unshift({ id: Date.now(), text: taskText, done: false });
+                saveTasks();
+                renderTasks();
+                const reply = `Protocolo atualizado. Adicionei a tarefa **"${taskText}"** à sua lista.`;
+                appendMessage('ana', reply, 'NÚCLEO LOCAL');
+                speakText(reply);
+                return;
+            }
+
+            if (lower.includes('minhas tarefas') || lower.includes('listar tarefas')) {
+                const pending = appTasks.filter(t => !t.done);
+                const reply = pending.length
+                    ? `Você possui **${pending.length} tarefa(s) pendente(s)**:\n` + pending.map((t, i) => `${i + 1}. ${t.text}`).join('\n')
+                    : 'Todas as suas tarefas estão concluídas no momento.';
+                appendMessage('ana', reply, 'NÚCLEO LOCAL');
+                speakText(reply);
+                return;
+            }
+
+            // 3. Cálculos Matemáticos Reais
+            const calcMatch = userText.match(/^(?:calcular|quanto [ée]|calcule)\s+([0-9+\-*/().\s^%]+)$/i);
+            if (calcMatch) {
+                try {
+                    const expr = calcMatch[1].replace(/\^/g, '**');
+                    if (/^[0-9+\-*/().\s*%]+$/.test(expr)) {
+                        const res = Function('"use strict";return (' + expr + ')')();
+                        const reply = `Resultado do cálculo: **${res}**`;
+                        appendMessage('ana', reply, 'UNIDADE MATEMÁTICA');
+                        speakText(`O resultado é ${res}`);
+                        return;
+                    }
+                } catch (_) {}
+            }
+
+            // 4. Data e Hora Atual
+            if (lower.includes('que horas') || lower.includes('hora atual') || lower.includes('data de hoje') || lower.includes('que dia é hoje')) {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const reply = `Agora são **${timeStr}**, ${dateStr}.`;
+                appendMessage('ana', reply, 'RELÓGIO DO SISTEMA');
+                speakText(reply);
+                return;
+            }
+
+            // 5. Pesquisa Web via Chat
+            const searchMatch = userText.match(/^(?:pesquisar|buscar na internet|pesquise sobre|o que [ée])\s+(.+)/i);
+            if (searchMatch && appSettings.llmProvider === 'local') {
+                const query = searchMatch[1].replace(/\?$/, '').trim();
+                const resText = await fetchWebKnowledgeSummary(query);
+                appendMessage('ana', resText, 'WIKIPEDIA / WEB API');
+                speakText(resText);
+                return;
+            }
+
+            // 6. Criação de Código / Site via Chat
+            if (lower.includes('criar código') || lower.includes('gerar site') || lower.includes('site futurista')) {
+                loadCodeTemplate('landing');
+                switchTab('code');
+                const reply = 'Abri o **Laboratório de Código** com um template completo de site futurista em HTML/CSS/JS pronto para visualização e edição.';
+                appendMessage('ana', reply, 'MÓDULO DEV');
+                speakText(reply);
+                return;
+            }
+
+            // 7. Diagnóstico do Sistema
+            if (lower.includes('diagnóstico') || lower.includes('status do sistema')) {
+                const reply = `**Diagnóstico da ANA AI:**\n• Núcleo Local: **Operacional**\n• Provedor LLM: **${appSettings.llmProvider.toUpperCase()}**\n• Motor de Imagens: **${appSettings.imgProvider === 'pollinations' ? 'Pollinations.ai Ativo' : 'Desativado'}**\n• Motor de Vídeo: **${appSettings.vidEndpoint ? 'Endpoint Configurado' : 'Não conectado'}**\n• Memórias Autorizadas: **${appMemories.length} registro(s)**`;
+                appendMessage('ana', reply, 'TELEMETRIA');
+                speakText('Todos os sistemas locais estão operacionais. Confira os detalhes das conexões externas na tela.');
+                return;
+            }
+
+            // 8. Chamada Real para API Externa (se configurada)
+            if (appSettings.llmProvider !== 'local' && appSettings.llmKey.trim() !== '') {
+                try {
+                    const aiResponse = await callExternalLLM(userText);
+                    appendMessage('ana', aiResponse, appSettings.llmProvider.toUpperCase());
+                    speakText(aiResponse);
+                    return;
+                } catch (err) {
+                    const errReply = `Falha na conexão com **${appSettings.llmProvider.toUpperCase()}**: ${err.message}. Verifique sua chave de API nas Configurações.`;
+                    appendMessage('ana', errReply, 'ERRO DE REDE');
+                    speakText('Houve uma falha ao conectar com o provedor externo de inteligência artificial.');
+                    return;
+                }
+            }
+
+            // 9. Resposta Honesta no Modo Local (sem API externa conectada)
+            const localReply = `Recebi sua mensagem: *"${userText}"*.\n\nNo momento estou operando no **Núcleo Local** (sem chave de API externa conectada). Posso executar imediatamente:\n• Gerenciar tarefas (*"adicionar tarefa estudar Python"*)\n• Salvar memórias autorizadas (*"lembrar que meu objetivo é..."*)\n• Pesquisar fatos na internet (*"pesquisar sobre buracos negros"*)\n• Gerar códigos e sites (*"gerar site futurista"*)\n• Cálculos e consultas de hora/data.\n\nPara conversas generativas avançadas, conecte uma chave gratuita do **Google Gemini** ou **Groq** na aba **APIs, Voz & Cotas**.`;
+            appendMessage('ana', localReply, 'NÚCLEO LOCAL');
+            speakText('Recebi seu comando. Estou operando no núcleo local. Para respostas avançadas de linguagem, conecte uma chave gratuita nas configurações.');
+        }
+
+        /* ============================================================================
+           INTEGRAÇÃO REAL COM APIS GRATUITAS DE LLM (GEMINI / GROQ / OPENROUTER)
+           ============================================================================ */
+        async function callExternalLLM(prompt) {
+            const provider = appSettings.llmProvider;
+            const key = appSettings.llmKey.trim();
+            const memoryContext = appMemories.length
+                ? `\nMemórias autorizadas do usuário:\n${appMemories.map(m => '- ' + m.text).join('\n')}`
+                : '';
+
+            const systemInstruction = `Você é a ANA AI, uma assistente pessoal futurista inspirada na IA do Tony Stark. Responda sempre em português brasileiro, de forma inteligente, amigável, criativa e objetiva.${memoryContext}`;
+
+            if (provider === 'gemini') {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemInstruction }] },
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error?.message || 'Erro na API Gemini');
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta do modelo.';
+            }
+
+            if (provider === 'groq' || provider === 'openrouter') {
+                const url = provider === 'groq'
+                    ? 'https://api.groq.com/openai/v1/chat/completions'
+                    : 'https://openrouter.ai/api/v1/chat/completions';
+                const model = provider === 'groq' ? 'llama-3.3-70b-versatile' : 'meta-llama/llama-3.3-70b-instruct:free';
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${key}`
+                    },
+                    body: JSON.stringify({
+                        model,
+                        messages: [
+                            { role: 'system', content: systemInstruction },
+                            { role: 'user', content: prompt }
+                        ]
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error?.message || 'Erro na API');
+                return data.choices?.[0]?.message?.content || 'Sem resposta do modelo.';
+            }
+
+            throw new Error('Provedor não configurado.');
+        }
+
+        /* ============================================================================
+           PESQUISA REAL NA INTERNET (WIKIPEDIA API PT-BR + DUCKDUCKGO)
+           ============================================================================ */
+        async function fetchWebKnowledgeSummary(query) {
+            if (!consumeQuota('search')) {
+                return 'Sua cota diária de pesquisas na internet foi atingida.';
+            }
+            try {
+                const wikiUrl = `https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=2`;
+                const res = await fetch(wikiUrl);
+                const data = await res.json();
+                const hits = data?.query?.search || [];
+                if (hits.length === 0) {
+                    return `Não encontrei resultados diretos na Wikipedia para **"${query}"**. Tente termos mais específicos.`;
+                }
+                const cleanSnippet = hits[0].snippet.replace(/<\/?[^>]+(>|$)/g, '');
+                return `**Resultado da Pesquisa Web (${hits[0].title}):**\n${cleanSnippet}...\n\n🔗 Fonte: https://pt.wikipedia.org/wiki/${encodeURIComponent(hits[0].title.replace(/ /g, '_'))}`;
+            } catch (e) {
+                return 'Erro de conexão ao consultar a base de pesquisa web.';
+            }
+        }
+
+        async function handleWebSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('web-search-input').value.trim();
+            if (!query) return;
+
+            if (!consumeQuota('search')) {
+                showHudModal('Cota Esgotada', 'Você atingiu o limite diário de pesquisas web.');
+                return;
+            }
+
+            const container = document.getElementById('search-results-container');
+            container.innerHTML = `<div class="p-6 text-center text-xs text-cyan-400 animate-pulse">Varrendo indexadores web para "${query}"...</div>`;
+            setCoreState('processing', 'PESQUISANDO NA INTERNET...');
+
+            try {
+                const wikiUrl = `https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=5`;
+                const res = await fetch(wikiUrl);
+                const data = await res.json();
+                const results = data?.query?.search || [];
+
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+
+                if (results.length === 0) {
+                    container.innerHTML = `<div class="p-4 rounded-xl bg-slate-950 border border-amber-500/30 text-xs text-amber-300">Nenhum artigo encontrado para "${query}".</div>`;
+                    return;
+                }
+
+                container.innerHTML = results.map(item => {
+                    const snippet = item.snippet.replace(/<\/?[^>]+(>|$)/g, '');
+                    const link = `https://pt.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`;
+                    return `
+                        <div class="hud-card rounded-xl p-4 space-y-1.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="font-semibold text-sm text-cyan-300">${item.title}</h4>
+                                <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-emerald-400 hover:underline flex items-center gap-1">
+                                    Abrir Fonte <i data-lucide="external-link" class="w-3 h-3"></i>
+                                </a>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">${snippet}...</p>
+                        </div>
+                    `;
+                }).join('');
+                lucide.createIcons();
+            } catch (err) {
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+                container.innerHTML = `<div class="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-300">Falha na conexão com o serviço de busca.</div>`;
+            }
+        }
+
+        /* ============================================================================
+           GERAÇÃO REAL DE IMAGENS & VÍDEOS (COM REGRA ESTRITA DE HONESTIDADE)
+           ============================================================================ */
+        function enableFreeImageEngine() {
+            appSettings.imgProvider = 'pollinations';
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appSettings));
+            updateDiagnosticsUI();
+            showHudToast('Motor gratuito Pollinations.ai ativado.');
+        }
+
+        async function generateRealImage() {
+            if (appSettings.imgProvider === 'none') {
+                showHudModal('Motor de Imagem Inativo', 'Ative o motor gratuito Pollinations.ai no painel acima ou nas Configurações antes de gerar imagens.');
+                return;
+            }
+
+            const prompt = document.getElementById('img-prompt').value.trim();
+            if (!prompt) {
+                showHudModal('Prompt Vazio', 'Descreva a imagem que deseja criar.');
+                return;
+            }
+
+            if (!consumeQuota('img')) {
+                showHudModal('Cota de Imagens Esgotada', 'Você atingiu seu limite diário de geração de imagens.');
+                return;
+            }
+
+            const [w, h] = document.getElementById('img-aspect').value.split('x');
+            const box = document.getElementById('img-result-box');
+            box.innerHTML = `<div class="py-10 text-xs text-cyan-400 animate-pulse">Sintetizando pixels via Pollinations.ai...</div>`;
+            setCoreState('processing', 'GERANDO IMAGEM REAL...');
+
+            const seed = Math.floor(Math.random() * 999999);
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${seed}&nologo=true`;
+
+            const img = new Image();
+            img.onload = () => {
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+                box.innerHTML = `
+                    <img src="${imageUrl}" alt="${prompt}" class="max-h-80 rounded-lg border border-cyan-400/40 shadow-lg mb-3">
+                    <div class="flex gap-2">
+                        <a href="${imageUrl}" target="_blank" download="ana-ai-image.png" class="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-semibold text-xs">Abrir / Baixar Imagem</a>
+                    </div>
+                `;
+            };
+            img.onerror = () => {
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+                box.innerHTML = `<p class="text-xs text-rose-400">O serviço externo de imagens não respondeu no momento. Nenhum placeholder falso foi exibido.</p>`;
+            };
+            img.src = imageUrl;
+        }
+
+        async function generateRealVideo() {
+            const endpoint = appSettings.vidEndpoint.trim();
+            if (!endpoint) {
+                showHudModal(
+                    'Serviço de Vídeo Não Conectado',
+                    'Não há nenhum servidor ou API de vídeo configurado. A ANA AI não simula vídeos falsos. Conecte um endpoint real (ex: Replicate, Fal.ai ou HuggingFace) na aba Configurações.'
+                );
+                return;
+            }
+
+            const prompt = document.getElementById('vid-prompt').value.trim();
+            if (!prompt) return;
+
+            if (!consumeQuota('vid')) {
+                showHudModal('Cota de Vídeos Esgotada', 'Você atingiu seu limite diário de vídeos.');
+                return;
+            }
+
+            const box = document.getElementById('vid-result-box');
+            box.innerHTML = `<div class="py-8 text-xs text-purple-300 animate-pulse">Enviando requisição ao endpoint configurado...</div>`;
+            setCoreState('processing', 'SOLICITANDO SÍNTESE DE VÍDEO...');
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await res.json();
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+
+                if (data.video_url) {
+                    box.innerHTML = `<video src="${data.video_url}" controls class="max-h-72 rounded-lg border border-purple-400/50"></video>`;
+                } else {
+                    box.innerHTML = `<p class="text-xs text-amber-300">Resposta recebida do endpoint, porém sem campo <code>video_url</code> direto: ${JSON.stringify(data).slice(0, 180)}</p>`;
+                }
+            } catch (err) {
+                setCoreState('idle', 'SISTEMA ONLINE • AGUARDANDO');
+                box.innerHTML = `<p class="text-xs text-rose-400">Falha ao conectar com o endpoint de vídeo: ${err.message}</p>`;
+            }
+        }
+
+        /* ============================================================================
+           LABORATÓRIO DE CÓDIGO & PREVIEW SANDBOX
+           ============================================================================ */
+        const CODE_TEMPLATES = {
+            landing: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<style>
+  body { margin:0; font-family: sans-serif; background: #050b18; color: #e2e8f0; display:flex; align-items:center; justify-content:center; height:100vh; text-align:center; }
+  .card { border: 1px solid #00f3ff; padding: 2rem; border-radius: 16px; box-shadow: 0 0 25px rgba(0,243,255,0.2); max-width: 400px; }
+  h1 { color: #00f3ff; margin-top: 0; }
+  button { background: #00f3ff; color: #030712; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>PROJETO NEXUS</h1>
+    <p>Interface gerada pelo Laboratório de Código da ANA AI.</p>
+    <button onclick="this.textContent='SISTEMA ATIVADO!'">Iniciar Protocolo</button>
+  </div>
+</body>
+</html>`,
+            calculator: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<style>
+  body { background:#090d16; color:#fff; font-family:monospace; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+  .calc { background:#111827; padding:20px; border-radius:14px; border:1px solid #38bdf8; width:240px; }
+  input { width:100%; box-sizing:border-box; padding:10px; font-size:18px; margin-bottom:10px; background:#030712; color:#38bdf8; border:1px solid #1e293b; text-align:right; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  button { padding:12px; background:#1e293b; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:15px; }
+  button:hover { background:#0284c7; }
+</style>
+</head>
+<body>
+  <div class="calc">
+    <input id="d" readonly value="0">
+    <div class="grid">
+      <button onclick="add('7')">7</button><button onclick="add('8')">8</button><button onclick="add('9')">9</button><button onclick="add('/')">/</button>
+      <button onclick="add('4')">4</button><button onclick="add('5')">5</button><button onclick="add('6')">6</button><button onclick="add('*')">*</button>
+      <button onclick="add('1')">1</button><button onclick="add('2')">2</button><button onclick="add('3')">3</button><button onclick="add('-')">-</button>
+      <button onclick="cls()">C</button><button onclick="add('0')">0</button><button onclick="eq()">=</button><button onclick="add('+')">+</button>
+    </div>
+  </div>
+  <script>
+    const d = document.getElementById('d');
+    function add(v){ d.value = d.value === '0' ? v : d.value + v; }
+    function cls(){ d.value = '0'; }
+    function eq(){ try { d.value = eval(d.value); } catch { d.value = 'Erro'; } }
+  <\/script>
+</body>
+</html>`
+        };
+
+        function loadCodeTemplate(key) {
+            document.getElementById('code-editor').value = CODE_TEMPLATES[key];
+            runCodePreview();
+        }
+
+        function runCodePreview() {
+            const code = document.getElementById('code-editor').value;
+            document.getElementById('code-preview-frame').srcdoc = code;
+        }
+
+        function copyEditorCode() {
+            const editor = document.getElementById('code-editor');
+            editor.select();
+            document.execCommand('copy');
+            showHudToast('Código copiado para a área de transferência.');
+        }
+
+        /* ============================================================================
+           TAREFAS, ANOTAÇÕES & MEMÓRIA AUTORIZADA
+           ============================================================================ */
+        function saveTasks() {
+            localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(appTasks));
+        }
+
+        function addTaskFromForm(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-task-input');
+            const text = input.value.trim();
+            if (!text) return;
+            appTasks.unshift({ id: Date.now(), text, done: false });
+            input.value = '';
+            saveTasks();
+            renderTasks();
+        }
+
+        function toggleTask(id) {
+            const t = appTasks.find(item => item.id === id);
+            if (t) t.done = !t.done;
+            saveTasks();
+            renderTasks();
+        }
+
+        function deleteTask(id) {
+            appTasks = appTasks.filter(item => item.id !== id);
+            saveTasks();
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('task-list');
+            if (!appTasks.length) {
+                list.innerHTML = `<li class="text-xs text-slate-500 p-3 text-center border border-dashed border-cyan-500/20 rounded-xl">Nenhuma tarefa registrada.</li>`;
+                return;
+            }
+            list.innerHTML = appTasks.map(t => `
+                <li class="flex items-center justify-between gap-2 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                    <button onclick="toggleTask(${t.id})" class="flex items-center gap-2.5 text-left flex-1">
+                        <span class="w-4 h-4 rounded border ${t.done ? 'bg-emerald-500 border-emerald-400' : 'border-cyan-400'} flex items-center justify-center text-[10px] text-slate-950 font-bold">
+                            ${t.done ? '✓' : ''}
+                        </span>
+                        <span class="text-xs sm:text-sm ${t.done ? 'line-through text-slate-500' : 'text-slate-200'}">${t.text}</span>
+                    </button>
+                    <button onclick="deleteTask(${t.id})" class="text-slate-500 hover:text-rose-400 p-1">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </li>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function saveQuickNotes() {
+            const val = document.getElementById('quick-notes-area').value;
+            localStorage.setItem(STORAGE_KEYS.NOTES, val);
+            const status = document.getElementById('notes-saved-status');
+            status.textContent = 'Sincronizado ✓';
+        }
+
+        // Sistema de Memória com Autorização Explícita
+        function requestMemoryAuthorization(fact) {
+            showHudModal(
+                'Autorização de Memória Permanente',
+                `Deseja autorizar que a ANA AI grave a seguinte informação no banco de memória local?\n\n"${fact}"`,
+                [
+                    {
+                        label: 'Recusar',
+                        cls: 'px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs',
+                        onClick: () => {
+                            closeHudModal();
+                            appendMessage('ana', 'Compreendido. A informação não foi armazenada na memória permanente.', 'PRIVACIDADE');
+                        }
+                    },
+                    {
+                        label: 'Autorizar & Gravar',
+                        cls: 'px-4 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-semibold text-xs',
+                        onClick: () => {
+                            closeHudModal();
+                            commitMemory(fact);
+                            const msg = `Informação autorizada e salva no núcleo de memória: **"${fact}"**.`;
+                            appendMessage('ana', msg, 'MEMÓRIA ATUALIZADA');
+                            speakText('Informação gravada na minha memória permanente.');
+                        }
+                    }
+                ]
+            );
+        }
+
+        function manualAddMemory(e) {
+            e.preventDefault();
+            const input = document.getElementById('manual-memory-input');
+            const val = input.value.trim();
+            if (!val) return;
+            input.value = '';
+            commitMemory(val);
+            showHudToast('Memória autorizada salva.');
+        }
+
+        function commitMemory(text) {
+            appMemories.unshift({
+                id: Date.now(),
+                text,
+                date: new Date().toLocaleDateString('pt-BR')
+            });
+            localStorage.setItem(STORAGE_KEYS.MEMORY, JSON.stringify(appMemories));
+            renderMemories();
+        }
+
+        function deleteMemory(id) {
+            appMemories = appMemories.filter(m => m.id !== id);
+            localStorage.setItem(STORAGE_KEYS.MEMORY, JSON.stringify(appMemories));
+            renderMemories();
+        }
+
+        function renderMemories() {
+            const container = document.getElementById('memory-list');
+            if (!appMemories.length) {
+                container.innerHTML = `<div class="col-span-full p-6 text-center text-xs text-slate-500 border border-dashed border-cyan-500/20 rounded-xl">Nenhuma memória autorizada salva até o momento.</div>`;
+                return;
+            }
+            container.innerHTML = appMemories.map(m => `
+                <div class="hud-card rounded-xl p-3.5 flex items-start justify-between gap-3">
+                    <div>
+                        <p class="text-xs sm:text-sm text-slate-200">${m.text}</p>
+                        <span class="text-[10px] font-mono-code text-cyan-400">Autorizado em ${m.date}</span>
+                    </div>
+                    <button onclick="deleteMemory(${m.id})" class="text-slate-500 hover:text-rose-400 p-1" title="Apagar memória">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        /* ============================================================================
+           CONFIGURAÇÕES, DIAGNÓSTICO E MODAIS HUD
+           ============================================================================ */
+        function loadSettingsIntoUI() {
+            document.getElementById('cfg-llm-provider').value = appSettings.llmProvider;
+            document.getElementById('cfg-llm-key').value = appSettings.llmKey;
+            document.getElementById('cfg-img-provider').value = appSettings.imgProvider;
+            document.getElementById('cfg-vid-endpoint').value = appSettings.vidEndpoint;
+
+            document.getElementById('voice-rate').value = appSettings.voiceRate;
+            document.getElementById('rate-val').textContent = appSettings.voiceRate;
+            document.getElementById('voice-pitch').value = appSettings.voicePitch;
+            document.getElementById('pitch-val').textContent = appSettings.voicePitch;
+
+            document.getElementById('limit-msg').value = appSettings.limits.msg;
+            document.getElementById('limit-img').value = appSettings.limits.img;
+            document.getElementById('limit-vid').value = appSettings.limits.vid;
+            document.getElementById('limit-search').value = appSettings.limits.search;
+
+            updateDiagnosticsUI();
+            updateVoiceButtonUI();
+        }
+
+        function saveAllSettings() {
+            appSettings.llmProvider = document.getElementById('cfg-llm-provider').value;
+            appSettings.llmKey = document.getElementById('cfg-llm-key').value.trim();
+            appSettings.imgProvider = document.getElementById('cfg-img-provider').value;
+            appSettings.vidEndpoint = document.getElementById('cfg-vid-endpoint').value.trim();
+
+            appSettings.voiceName = document.getElementById('voice-select').value;
+            appSettings.voiceRate = parseFloat(document.getElementById('voice-rate').value);
+            appSettings.voicePitch = parseFloat(document.getElementById('voice-pitch').value);
+
+            appSettings.limits.msg = Math.max(1, parseInt(document.getElementById('limit-msg').value) || 100);
+            appSettings.limits.img = Math.max(0, parseInt(document.getElementById('limit-img').value) || 15);
+            appSettings.limits.vid = Math.max(0, parseInt(document.getElementById('limit-vid').value) || 3);
+            appSettings.limits.search = Math.max(1, parseInt(document.getElementById('limit-search').value) || 40);
+
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appSettings));
+            updateDiagnosticsUI();
+            updateQuotaUI();
+            showHudToast('Configurações e chaves salvas localmente.');
+        }
+
+        function updateDiagnosticsUI() {
+            const diagLlm = document.getElementById('diag-llm');
+            if (appSettings.llmProvider !== 'local' && appSettings.llmKey) {
+                diagLlm.textContent = appSettings.llmProvider.toUpperCase() + ' ATIVO';
+                diagLlm.className = 'text-emerald-400 font-mono-code text-[11px]';
+            } else {
+                diagLlm.textContent = 'MODO LOCAL';
+                diagLlm.className = 'text-amber-400 font-mono-code text-[11px]';
+            }
+
+            const diagImg = document.getElementById('diag-img');
+            const imgBadge = document.getElementById('img-engine-badge');
+            const imgBanner = document.getElementById('img-activation-banner');
+            if (appSettings.imgProvider === 'pollinations') {
+                diagImg.textContent = 'POLLINATIONS ON';
+                diagImg.className = 'text-emerald-400 font-mono-code text-[11px]';
+                imgBadge.textContent = 'ATIVO (GRATUITO)';
+                imgBadge.className = 'text-[11px] font-mono-code px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-400/40 text-emerald-300';
+                imgBanner.classList.add('hidden');
+            } else {
+                diagImg.textContent = 'DESATIVADO';
+                diagImg.className = 'text-amber-400 font-mono-code text-[11px]';
+                imgBadge.textContent = 'NÃO ATIVADO';
+                imgBanner.classList.remove('hidden');
+            }
+
+            const diagVid = document.getElementById('diag-vid');
+            const vidBadge = document.getElementById('vid-engine-badge');
+            if (appSettings.vidEndpoint) {
+                diagVid.textContent = 'ENDPOINT PRONTO';
+                diagVid.className = 'text-emerald-400 font-mono-code text-[11px]';
+                vidBadge.textContent = 'CONECTADO';
+                vidBadge.className = 'text-[11px] font-mono-code px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-400/40 text-emerald-300';
+            } else {
+                diagVid.textContent = 'NÃO CONECTADO';
+                diagVid.className = 'text-rose-400 font-mono-code text-[11px]';
+                vidBadge.textContent = 'OFFLINE';
+            }
+        }
+
+        function showHudModal(title, bodyText, buttons = null) {
+            const modal = document.getElementById('hud-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = bodyText.replace(/\n/g, '<br>');
+            const actions = document.getElementById('modal-actions');
+            actions.innerHTML = '';
+
+            if (!buttons) {
+                const okBtn = document.createElement('button');
+                okBtn.textContent = 'Entendido';
+                okBtn.className = 'px-4 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-semibold text-xs';
+                okBtn.onclick = closeHudModal;
+                actions.appendChild(okBtn);
+            } else {
+                buttons.forEach(b => {
+                    const btn = document.createElement('button');
+                    btn.textContent = b.label;
+                    btn.className = b.cls;
+                    btn.onclick = b.onClick;
+                    actions.appendChild(btn);
+                });
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeHudModal() {
+            const modal = document.getElementById('hud-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function showHudToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-16 right-4 z-50 px-4 py-2.5 rounded-xl hud-panel border border-cyan-400/60 text-xs text-cyan-200 shadow-lg msg-anim';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function clearChatHistory() {
+            chatHistory = [];
+            localStorage.removeItem(STORAGE_KEYS.CHAT);
+            document.getElementById('chat-messages').innerHTML = '';
+            triggerCoreGreeting(false);
+        }
+
+        function triggerCoreGreeting(withSpeech = true) {
+            const hour = new Date().getHours();
+            const period = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+            const greeting = `${period}! Eu sou a **ANA AI**, sua assistente pessoal. Todos os meus módulos locais estão online e prontos. Como posso ajudar você hoje?`;
+            appendMessage('ana', greeting, 'INICIALIZAÇÃO');
+            if (withSpeech) speakText(`${period}! Eu sou a ANA AI, sua assistente pessoal. Como posso ajudar você hoje?`);
+        }
+
+        /* ============================================================================
+           INICIALIZAÇÃO DO SISTEMA
+           ============================================================================ */
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadVoices();
+            loadSettingsIntoUI();
+            updateQuotaUI();
+            renderTasks();
+            renderMemories();
+            loadCodeTemplate('landing');
+
+            // Carregar notas salvas
+            const savedNotes = localStorage.getItem(STORAGE_KEYS.NOTES);
+            if (savedNotes) document.getElementById('quick-notes-area').value = savedNotes;
+
+            // Relógio HUD em tempo real
+            const updateClock = () => {
+                document.getElementById('hud-clock').textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            };
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Restaurar histórico ou cumprimentar
+            if (chatHistory.length > 0) {
+                const container = document.getElementById('chat-messages');
+                chatHistory.forEach(m => {
+                    const isAna = m.sender === 'ana';
+                    const wrapper = document.createElement('div');
+                    wrapper.className = `flex flex-col ${isAna ? 'items-start' : 'items-end'}`;
+                    wrapper.innerHTML = `
+                        <div class="${isAna ? 'max-w-[88%] sm:max-w-[80%] rounded-2xl rounded-tl-sm p-3.5 bg-slate-900/95 border border-cyan-500/35 text-slate-100 text-sm' : 'max-w-[88%] sm:max-w-[80%] rounded-2xl rounded-tr-sm p-3.5 bg-gradient-to-r from-cyan-600/30 to-blue-600/30 border border-cyan-400/50 text-white text-sm'}">
+                            ${formatMessageHTML(m.text)}
+                        </div>
+                        <span class="text-[10px] font-mono-code text-slate-500 mt-1 px-1">${isAna ? 'ANA AI' : 'VOCÊ'} • ${m.timestamp}</span>
+                    `;
+                    container.appendChild(wrapper);
+                });
+                container.scrollTop = container.scrollHeight;
+            } else {
+                triggerCoreGreeting(true);
+            }
+        });
+    </script>
+</body>
+</html>
+```
